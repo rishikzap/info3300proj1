@@ -11,7 +11,7 @@
         stroke: none;
       }
     </style>
-    <svg id="lineGraph" height="500" width="500"></svg>
+    <svg id="lineGraph" height="500" width="1000"></svg>
     <svg id="scatterPlot" height="500" width="500"></svg>
     <svg id="barChart" height="500" width="500"></svg>
     <script>
@@ -19,7 +19,7 @@
       const svgLineGraph = d3.select("svg#lineGraph");
       const height1 = svgLineGraph.attr("height");
       const width1 = svgLineGraph.attr("width");
-      const margin = { top: 10, right: 10, bottom: 10, left: 10 };
+      const margin = { top: 10, right: 10, bottom: 50, left: 70 };
       const chartWidth1 = width1 - margin.left - margin.right;
       const chartHeight1 = height1 - margin.top - margin.bottom;
       let annotations1 = svgLineGraph.append("g").attr("id", "annotations1");
@@ -29,7 +29,7 @@
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
       const accessData = async function () {
-        const data = await d3.csv("data.csv");
+        const data = await d3.csv("data_by_year.csv");
         const happinessYear = await d3.csv("data_by_year.csv");
         const byGenre = await d3.csv("data_by_genres.csv");
 
@@ -46,19 +46,22 @@
 
         console.log(dateExtent);
 
+        console.log(dateExtent);
+
         const happinessExtent = d3.extent(data, (d) => d["acousticness"]);
         const happinessScale = d3
           .scaleLinear()
-          .domain(happinessExtent)
+          .domain([0, 1])
           .range([chartHeight1, 0]);
 
+        console.log(happinessExtent);
+
         //x-axis
-        let xAxis1 = d3.axisBottom(dateScale).ticks(5);
+        let xAxis1 = d3.axisBottom(dateScale);
         let xGridlines1 = d3
           .axisBottom(dateScale)
           .tickSize(-chartHeight1 - 10)
-          .tickFormat("")
-          .ticks(5);
+          .tickFormat("");
 
         //y-axis
         let yAxis1 = d3.axisLeft(happinessScale);
@@ -101,70 +104,89 @@
 
         let lineGenerator = d3
           .line()
-          .x((d) => dateScale(d["year"]))
+          .x((d) => dateScale(d["year_date"]))
           .y((d) => happinessScale(d["acousticness"]))
           .curve(d3.curveMonotoneX);
 
         //add line to graph
 
-        //scatterPlot happiness vs popularity
-        const svgScatterPlot = d3.select("svg#scatterPlot");
-        const height2 = svgScatterPlot.attr("height");
-        const width2 = svgScatterPlot.attr("width");
-        const chartWidth2 = width2 - margin.left - margin.right;
-        const chartHeight2 = height2 - margin.top - margin.bottom;
-        let annotations2 = svgScatterPlot
-          .append("g")
-          .attr("id", "annotations2");
+        chartArea1
+          .append("path")
+          .datum(data)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "steelblue")
+          .attr("stroke-width", 3)
+          .attr("d", lineGenerator);
 
-        //x scale popularity
-        const popExtent = d3.extent(data, (d) => d["popularity"]);
-        const popScale = d3
-          .scaleLinear()
-          .domain(popExtent)
-          .range([chartHeight2, 0]);
+        // //scatterPlot happiness vs popularity
+        // const svgScatterPlot = d3.select("svg#scatterPlot");
+        // const height2 = svgScatterPlot.attr("height");
+        // const width2 = svgScatterPlot.attr("width");
+        // const chartWidth2 = width2 - margin.left - margin.right;
+        // const chartHeight2 = height2 - margin.top - margin.bottom;
+        // let annotations2 = svgScatterPlot
+        //   .append("g")
+        //   .attr("id", "annotations2");
 
-        //y scale is above
+        // //x scale popularity
+        // const popExtent = d3.extent(data, (d) => d["popularity"]);
+        // const popScale = d3
+        //   .scaleLinear()
+        //   .domain(popExtent)
+        //   .range([chartHeight2, 0]);
 
-        //x axis
-        let bottomAxis2 = d3.axisBottom(popScale);
+        // //y scale is above
 
-        let bottomGridlines2 = d3
-          .axisBottom(popScale)
-          .tickSize(-chartHeight2 - 10)
-          .tickFormat("");
-        let leftAxis2 = d3.axisLeft(happinessScale);
-        let leftGridlines = d3
-          .axisLeft(happinessScale)
-          .tickSize(-chartWidth2 - 10)
-          .tickFormat("");
-        annotations2
-          .append("g")
-          .attr("class", "y axis")
-          .attr("transform", `translate(${margin.left - 10},${margin.top})`)
-          .call(bottomAxis2);
-        annotations2
-          .append("g")
-          .attr("class", "y gridelines")
-          .attr("transform", `translate(${margin.left - 10},${margin.top})`)
-          .call(leftGridlines2);
-        annotations2
-          .append("g")
-          .attr("class", "x axis")
-          .attr(
-            "transform",
-            `translate(${margin.left},${chartHeight2 + margin.top + 10})`
-          )
-          .call(bottomAxis2);
-        //barChart happiness vs genre
-        const svgBarChart = d3.select("svg#barChart");
-        const height3 = svgBarChart.attr("height");
-        const width3 = svgBarChart.attr("width");
-        const chartWidth3 = width3 - margin.left - margin.right;
-        const chartHeight3 = height3 - margin.top - margin.bottom;
-        let annotations3 = svgScatterPlot
-          .append("g")
-          .attr("id", "annotations3");
+        // //x axis
+        // let bottomAxis2 = d3.axisBottom(popScale);
+
+        // let bottomGridlines2 = d3
+        //   .axisBottom(popScale)
+        //   .tickSize(-chartHeight2 - 10)
+        //   .tickFormat("");
+        // let leftAxis2 = d3.axisLeft(happinessScale);
+        // let leftGridlines = d3
+        //   .axisLeft(happinessScale)
+        //   .tickSize(-chartWidth2 - 10)
+        //   .tickFormat("");
+        // annotations2
+        //   .append("g")
+        //   .attr("class", "y axis")
+        //   .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+        //   .call(bottomAxis2);
+        // annotations2
+        //   .append("g")
+        //   .attr("class", "y gridelines")
+        //   .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+        //   .call(leftGridlines2);
+        // annotations2
+        //   .append("g")
+        //   .attr("class", "x axis")
+        //   .attr(
+        //     "transform",
+        //     `translate(${margin.left},${chartHeight2 + margin.top + 10})`
+        //   )
+        //   .call(bottomAxis2);
+        // annotations2
+        //   .append("g")
+        //   .attr("class", "x gridlines")
+        //   .attr(
+        //     "transform",
+        //     `translate(${margin.left},${chartHeight + margin.top + 10})`
+        //   )
+        //   .call(bottomGridlines2);
+        // //add circles
+
+        // //barChart happiness vs genre
+        // const svgBarChart = d3.select("svg#barChart");
+        // const height3 = svgBarChart.attr("height");
+        // const width3 = svgBarChart.attr("width");
+        // const chartWidth3 = width3 - margin.left - margin.right;
+        // const chartHeight3 = height3 - margin.top - margin.bottom;
+        // let annotations3 = svgScatterPlot
+        //   .append("g")
+        //   .attr("id", "annotations3");
       };
       accessData();
     </script>
