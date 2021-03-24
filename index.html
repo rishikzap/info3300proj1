@@ -12,7 +12,7 @@
       }
     </style>
     <svg id="lineGraph" height="500" width="1000"></svg>
-    <svg id="scatterPlot" height="500" width="500"></svg>
+    <svg id="scatterPlot" height="500" width="1000"></svg>
     <svg id="barChart" height="500" width="1000"></svg>
     <script>
       //lineGraph happiness vs year
@@ -25,18 +25,27 @@
       let annotations1 = svgLineGraph.append("g").attr("id", "annotations1");
       let chartArea1 = svgLineGraph
         .append("g")
-        .attr("id", "points")
+        .attr("id", "chart1")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
       const accessData = async function () {
-        const data = await d3.csv("data_by_year.csv");
+        const allData = await d3.csv("data.csv");
+        let data = await d3.csv("data_by_year.csv");
         const happinessYear = await d3.csv("data_by_year.csv");
         const byGenre = await d3.csv("data_by_genres.csv");
 
+        data = data.filter((d) => d["year"] != "2021");
+
         const timeParser = d3.timeParse("%Y");
+
         data.forEach((d) => {
           d["year_date"] = timeParser(d["year"]);
         });
+
+        allData.forEach((d) => {
+          d["year_date"] = timeParser(d["year"]);
+        });
+
         // get extent and scales
         const dateExtent = d3.extent(data, (d) => d["year_date"]);
         const dateScale = d3
@@ -122,27 +131,31 @@
         let annotations2 = svgScatterPlot
           .append("g")
           .attr("id", "annotations2");
+        let chartArea2 = svgScatterPlot
+          .append("g")
+          .attr("id", "chart1")
+          .attr("transform", `translate(${margin.left},${margin.top})`);
 
         //x scale popularity
-        const popExtent = d3.extent(data, (d) => d["popularity"]);
+        const popExtent = d3.extent(allData, (d) => d["popularity"]);
         const popScale = d3
           .scaleLinear()
-          .domain([0, 10])
-          .range([0, chartWidth2]);
+          .domain(popExtent)
+          .range([chartHeight2, 0]);
 
         //y scale is above
 
         //x axis
-        let bottomAxis2 = d3.axisBottom(popScale);
+        let bottomAxis2 = d3.axisBottom(dateScale);
 
         let bottomGridlines2 = d3
-          .axisBottom(popScale)
+          .axisBottom(dateScale)
           .tickSize(-chartHeight2 - 10)
           .tickFormat("");
 
-        let leftAxis2 = d3.axisLeft(happinessScale);
+        let leftAxis2 = d3.axisLeft(popScale);
         let leftGridlines2 = d3
-          .axisLeft(happinessScale)
+          .axisLeft(popScale)
           .tickSize(-chartWidth2 - 10)
           .tickFormat("");
         annotations2
@@ -172,6 +185,16 @@
           )
           .call(bottomGridlines2);
         //add circles
+        let points = chartArea2
+          .selectAll("circle")
+          .data(allData)
+          .join("circle")
+          .attr("class", "circles")
+          .attr("cx", (d) => dateScale(d["year_date"]))
+          .attr("cy", (d) => popScale(d["popularity"]))
+          .attr("r", 3)
+          .attr("fill", "goldenrod")
+          .attr("id", (d) => d.popularity);
 
         //barChart happiness vs genre
         const svgBarChart = d3.select("svg#barChart");
