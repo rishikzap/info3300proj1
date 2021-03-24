@@ -13,6 +13,7 @@
     </style>
     <svg id="lineGraph" height="500" width="1000"></svg>
     <svg id="scatterPlot" height="500" width="1000"></svg>
+    <svg id="scatterPlot4" height="500" width="1000"></svg>
     <svg id="barChart" height="500" width="1000"></svg>
     <script>
       //lineGraph happiness vs year
@@ -275,6 +276,81 @@
             (d) => popScale3(popExtent3[0]) - popScale3(d["popularity"])
           )
           .attr("width", genreScale3.bandwidth());
+
+          //happiness vs popularity START HERE
+          const svgScatterPlot4 = d3.select("svg#scatterPlot4");
+          const height4 = svgScatterPlot4.attr("height");
+          const width4 = svgScatterPlot4.attr("width");
+          const chartWidth4 = width4 - margin.left - margin.right;
+          const chartHeight4 = height4 - margin.top - margin.bottom;
+          let annotations4 = svgScatterPlot4
+            .append("g")
+            .attr("id", "annotations4");
+          let chartArea4 = svgScatterPlot4
+            .append("g")
+            .attr("id", "chart4")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+          //x scale popularity
+          // const popExtent = d3.extent(allData, (d) => d["popularity"]);
+          // const popScale = d3
+          //   .scaleLinear()
+          //   .domain(popExtent)
+          //   .range([chartHeight4, 0]);
+
+          //y scale is above happiness
+
+          //x axis
+          let bottomAxis4 = d3.axisBottom(happinessScale);
+
+          let bottomGridlines4 = d3
+            .axisBottom(happinessScale)
+            .tickSize(-chartHeight4 - 10)
+            .tickFormat("");
+
+          let leftAxis4 = d3.axisLeft(popScale);
+          let leftGridlines4 = d3
+            .axisLeft(popScale)
+            .tickSize(-chartWidth4 - 10)
+            .tickFormat("");
+          annotations4
+            .append("g")
+            .attr("class", "y axis")
+            .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+            .call(leftAxis4);
+          annotations4
+            .append("g")
+            .attr("class", "y gridelines")
+            .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+            .call(leftGridlines4);
+          annotations4
+            .append("g")
+            .attr("class", "x axis")
+            .attr(
+              "transform",
+              `translate(${margin.left},${chartHeight4 + margin.top + 10})`
+            )
+            .call(bottomAxis4);
+          annotations4
+            .append("g")
+            .attr("class", "x gridlines")
+            .attr(
+              "transform",
+              `translate(${margin.left},${chartHeight4 + margin.top + 10})`
+            )
+            .call(bottomGridlines4);
+          //add circles
+          let points4 = chartArea4
+            .selectAll("circle")
+            .data(allData)
+            .join("circle")
+            .attr("class", "circles")
+            .attr("cx", (d) => happinessScale(d["acousticness"]))
+            .attr("cy", (d) => popScale(d["popularity"]))
+            .attr("r", 3)
+            .attr("fill", "goldenrod")
+            .attr("id", (d) => d.popularity);
+
       };
       accessData();
     </script>
