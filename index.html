@@ -54,7 +54,7 @@
           .domain(dateExtent)
           .range([0, chartWidth1]);
 
-        const happinessExtent = d3.extent(data, (d) => d["acousticness"]);
+        const happinessExtent = d3.extent(data, (d) => d["valence"]);
         const happinessScale = d3
           .scaleLinear()
           .domain([0, 1])
@@ -109,7 +109,7 @@
         let lineGenerator = d3
           .line()
           .x((d) => dateScale(d["year_date"]))
-          .y((d) => happinessScale(d["acousticness"]))
+          .y((d) => happinessScale(d["valence"]))
           .curve(d3.curveMonotoneX);
 
         //add line to graph
