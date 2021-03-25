@@ -13,8 +13,8 @@
     </style>
     <svg id="lineGraph" height="500" width="1000"></svg>
     <svg id="zoomedInLineGraph" height="500" width="1000"></svg>
+    <svg id="taylorSwiftGraph" height="500" width="1000"></svg>
     <script>
-      //lineGraph happiness vs year
       const svgLineGraph = d3.select("svg#lineGraph");
       let height = svgLineGraph.attr("height");
       let width = svgLineGraph.attr("width");
@@ -48,8 +48,17 @@
         .attr("stroke", "black");
 
       const accessData = async function () {
-        let allData = await d3.csv("data.csv");
         let data = await d3.csv("data_by_year.csv");
+        let eminemData = await d3.csv("eminem_data.csv");
+        let kanyeData = await d3.csv("kanye_data.csv");
+        let nickiData = await d3.csv("nicki_data.csv");
+        let jcoleData = await d3.csv("jcole_data.csv");
+        let drakeData = await d3.csv("drake_data.csv");
+        let taylorData = await d3.csv("taylor_data.csv");
+        let arianaData = await d3.csv("ariana_data.csv");
+        let justinData = await d3.csv("justin_data.csv");
+        let mileyData = await d3.csv("miley_data.csv");
+        let katyData = await d3.csv("katy_data.csv");
 
         data = data.filter((d) => d["year"] != "2021");
 
@@ -154,7 +163,6 @@
             .y((d) => musicMeasureScale(d[i]))
             .curve(d3.curveMonotoneX);
 
-          console.log(i);
           chartArea
             .append("path")
             .datum(data)
@@ -166,11 +174,10 @@
             .attr("id", i);
         });
 
-        //line graph genre and valence by month in the past year
+        //START HERE line graph genre 1
         const zoomedSvg = d3.select("svg#zoomedInLineGraph");
         height = zoomedSvg.attr("height");
         width = zoomedSvg.attr("width");
-        margin.right = 30;
         chartWidth = width - margin.left - margin.right;
         chartHeight = height - margin.top - margin.bottom;
 
@@ -181,30 +188,35 @@
           .attr("id", "chart")
           .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        //x scale dates
-        const startDate = new Date("March 1, 2020 00:00:00");
-        const endDate = new Date("March 1, 2021 00:00:00");
-        dateScale = d3
-          .scaleTime()
-          .domain([startDate, endDate])
+        legend = chartArea
+          .append("g")
+          .attr("transform", `translate(${chartWidth - 130}, ${margin.top})`)
+          .attr("class", "legend");
+
+        // legendFrame = legend
+        //   .append("rect")
+        //   .attr("class", "frame")
+        //   .attr("x", 0)
+        //   .attr("y", 0)
+        //   .attr("rx", 10)
+        //   .attr("ry", 10)
+        //   .attr("height", 70)
+        //   .attr("width", 127)
+        //   .attr("fill", "white")
+        //   .attr("stroke-width", "1px")
+        //   .attr("stroke", "black");
+
+        // x scale years
+        let timeExtent = d3.extent(eminemData, (d) => d["year"]);
+        let timeScale = d3
+          .scaleLinear()
+          .domain([2011, 2019])
           .range([0, chartWidth]);
 
-        //y scale
-        console.log(allData);
-        musicMeasureExtent = d3.extent(allData, (d) => d["valence"]);
-        console.log(musicMeasureExtent);
-        musicMeasureScale = d3
-          .scaleLinear()
-          .domain(musicMeasureExtent)
-          .range([chartHeight, 0]);
-
         //x axis
-        let bottomAxis = d3
-          .axisBottom(dateScale)
-          .tickFormat(d3.timeFormat("%b '%y"));
-
+        let bottomAxis = d3.axisBottom(timeScale).tickFormat(d3.format("~f"));
         let bottomGridlines = d3
-          .axisBottom(dateScale)
+          .axisBottom(timeScale)
           .tickSize(-chartHeight - 10)
           .tickFormat("");
 
@@ -241,191 +253,165 @@
           )
           .call(bottomGridlines);
 
-        //add lines
-        timeParser = d3.timeParse("%Y-%m-%d");
+        let lineGen = d3
+          .line()
+          .x((d) => timeScale(d["year"]))
+          .y((d) => musicMeasureScale(d["valence"]))
+          .curve(d3.curveMonotoneX);
 
-        allData.forEach((d) => {
-          d["year_date"] = timeParser(d["release_date"]);
-        });
+        //enimem
+        chartArea
+          .append("path")
+          .datum(eminemData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "red")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
 
-        allData = allData.filter((d) => d["year_date"] != null);
-        allData = allData.filter((d) => d["year_date"] > startDate);
-        allData = allData.filter((d) => d["year_date"] < endDate);
+        //kanye west
+        chartArea
+          .append("path")
+          .datum(kanyeData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "blue")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
 
-        function checkArtists(d, name) {
-          let artists = d.toString();
-          return d.includes(name);
-        }
+        //nicki minaj
+        chartArea
+          .append("path")
+          .datum(nickiData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "green")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
 
-        let taylorSwiftData = allData.filter((d) =>
-          checkArtists(d["artists"], "Taylor Swift")
-        );
+        //j cole
+        chartArea
+          .append("path")
+          .datum(jcoleData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "black")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
 
-        let daBabyData = allData.filter((d) =>
-          checkArtists(d["artists"], "DaBaby")
-        );
+        //drake
+        chartArea
+          .append("path")
+          .datum(drakeData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "orange")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
 
-        let billieEilishData = allData.filter((d) =>
-          checkArtists(d["artists"], "Drake")
-        );
+        // END
+        const taylorSvg = d3.select("svg#taylorSwiftGraph");
+        height = taylorSvg.attr("height");
+        width = taylorSvg.attr("width");
 
-        console.log(taylorSwiftData);
-        console.log(daBabyData);
-        console.log(billieEilishData);
+        annotations = taylorSvg.append("g").attr("id", "annotations");
 
-        // //barChart happiness vs genre
-        // const svgBarChart = d3.select("svg#barChart");
-        // const height3 = svgBarChart.attr("height");
-        // const width3 = svgBarChart.attr("width");
-        // const chartWidth3 = width3 - margin.left - margin.right;
-        // const chartHeight3 = height3 - margin.top - margin.bottom;
+        chartArea = taylorSvg
+          .append("g")
+          .attr("id", "chart2")
+          .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        // let chartArea3 = svgBarChart
-        //   .append("g")
-        //   .attr("id", "points")
-        //   .attr("transform", `translate(${margin.left},${margin.top})`);
+        timeExtent = d3.extent(taylorData, (d) => d["year"]);
+        timeScale = d3.scaleLinear().domain(timeExtent).range([0, chartWidth]);
+        bottomAxis = d3.axisBottom(timeScale).tickFormat(d3.format("~f"));
+        bottomGridlines = d3
+          .axisBottom(timeScale)
+          .tickSize(-chartHeight - 10)
+          .tickFormat("");
 
-        // let topTen = byGenre.sort(function (a, b) {
-        //   return b.popularity - a.popularity;
-        // });
-        // topTen = topTen.slice(0, 10);
+        leftAxis = d3.axisLeft(musicMeasureScale);
+        leftGridlines = d3
+          .axisLeft(musicMeasureScale)
+          .tickSize(-chartWidth - 10)
+          .tickFormat("");
 
-        // const genres = d3.map(topTen, (d) => d["genres"]);
-        // const genreScale3 = d3
-        //   .scaleBand()
-        //   .domain(genres)
-        //   .range([0, chartWidth3])
-        //   .padding(0.05);
+        annotations
+          .append("g")
+          .attr("class", "y axis")
+          .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+          .call(leftAxis);
 
-        // const popExtent3 = d3.extent(byGenre, (d) => d["popularity"]);
-        // const popScale3 = d3
-        //   .scaleLinear()
-        //   .domain([
-        //     byGenre[byGenre.length - 1].popularity,
-        //     byGenre[0].popularity,
-        //   ])
-        //   .range([chartHeight3, 0]);
+        annotations
+          .append("g")
+          .attr("class", "y gridelines")
+          .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+          .call(leftGridlines);
+        annotations
+          .append("g")
+          .attr("class", "x axis")
+          .attr(
+            "transform",
+            `translate(${margin.left},${chartHeight + margin.top + 10})`
+          )
+          .call(bottomAxis);
+        annotations
+          .append("g")
+          .attr("class", "x gridlines")
+          .attr(
+            "transform",
+            `translate(${margin.left},${chartHeight + margin.top + 10})`
+          )
+          .call(bottomGridlines);
 
-        // console.log(popExtent3);
+        // taylor swift
+        chartArea
+          .append("path")
+          .datum(taylorData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "red")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
 
-        // let annotations3 = svgBarChart.append("g").attr("id", "annotations3");
+        // ariana grande
+        chartArea
+          .append("path")
+          .datum(arianaData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "blue")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
 
-        // let yAxis3 = d3.axisLeft(popScale3);
-        // let yAxisGridlines3 = d3
-        //   .axisLeft(popScale3)
-        //   .tickSize(-chartWidth3 - 10)
-        //   .tickFormat("");
+        // justin beiber
+        chartArea
+          .append("path")
+          .datum(justinData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "green")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
 
-        // annotations3
-        //   .append("g")
-        //   .attr("class", "y axis")
-        //   .attr("transform", `translate(${margin.left - 10}, ${margin.top})`)
-        //   .call(yAxis3);
+        // miley cyrus
+        chartArea
+          .append("path")
+          .datum(mileyData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "black")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
 
-        // annotations3
-        //   .append("g")
-        //   .attr("class", "y gridlines")
-        //   .attr("transform", `translate(${margin.left - 10}, ${margin.top})`)
-        //   .call(yAxisGridlines3);
-
-        // let xAxis3 = d3.axisBottom(genreScale3);
-
-        // annotations3
-        //   .append("g")
-        //   .attr("class", "x axis")
-        //   .attr(
-        //     "transform",
-        //     `translate(${margin.left}, ${chartHeight3 + margin.top + 10})`
-        //   )
-        //   .call(xAxis3);
-
-        // chartArea3
-        //   .selectAll("rect.bar")
-        //   .data(topTen)
-        //   .join("rect")
-        //   .attr("class", "bar")
-        //   .attr("fill", "steelblue")
-        //   .attr("x", (d) => genreScale3(d["genres"]))
-        //   .attr("y", (d) => popScale3(d["popularity"]))
-        //   .attr(
-        //     "height",
-        //     (d) => popScale3(popExtent3[0]) - popScale3(d["popularity"])
-        //   )
-        //   .attr("width", genreScale3.bandwidth());
-
-        // //happiness vs popularity START HERE
-        // const svgScatterPlot4 = d3.select("svg#scatterPlot4");
-        // const height4 = svgScatterPlot4.attr("height");
-        // const width4 = svgScatterPlot4.attr("width");
-        // const chartWidth4 = width4 - margin.left - margin.right;
-        // const chartHeight4 = height4 - margin.top - margin.bottom;
-        // let annotations4 = svgScatterPlot4
-        //   .append("g")
-        //   .attr("id", "annotations4");
-        // let chartArea4 = svgScatterPlot4
-        //   .append("g")
-        //   .attr("id", "chart4")
-        //   .attr("transform", `translate(${margin.left},${margin.top})`);
-
-        // //x scale popularity
-        // // const popExtent = d3.extent(allData, (d) => d["popularity"]);
-        // // const popScale = d3
-        // //   .scaleLinear()
-        // //   .domain(popExtent)
-        // //   .range([chartHeight4, 0]);
-
-        // //y scale is above happiness
-
-        // //x axis
-        // let bottomAxis4 = d3.axisBottom(happinessScale);
-
-        // let bottomGridlines4 = d3
-        //   .axisBottom(happinessScale)
-        //   .tickSize(-chartHeight4 - 10)
-        //   .tickFormat("");
-
-        // let leftAxis4 = d3.axisLeft(popScale);
-        // let leftGridlines4 = d3
-        //   .axisLeft(popScale)
-        //   .tickSize(-chartWidth4 - 10)
-        //   .tickFormat("");
-        // annotations4
-        //   .append("g")
-        //   .attr("class", "y axis")
-        //   .attr("transform", `translate(${margin.left - 10},${margin.top})`)
-        //   .call(leftAxis4);
-        // annotations4
-        //   .append("g")
-        //   .attr("class", "y gridelines")
-        //   .attr("transform", `translate(${margin.left - 10},${margin.top})`)
-        //   .call(leftGridlines4);
-        // annotations4
-        //   .append("g")
-        //   .attr("class", "x axis")
-        //   .attr(
-        //     "transform",
-        //     `translate(${margin.left},${chartHeight4 + margin.top + 10})`
-        //   )
-        //   .call(bottomAxis4);
-        // annotations4
-        //   .append("g")
-        //   .attr("class", "x gridlines")
-        //   .attr(
-        //     "transform",
-        //     `translate(${margin.left},${chartHeight4 + margin.top + 10})`
-        //   )
-        //   .call(bottomGridlines4);
-        // //add circles
-        // let points4 = chartArea4
-        //   .selectAll("circle")
-        //   .data(allData)
-        //   .join("circle")
-        //   .attr("class", "circles")
-        //   .attr("cx", (d) => happinessScale(d["acousticness"]))
-        //   .attr("cy", (d) => popScale(d["popularity"]))
-        //   .attr("r", 3)
-        //   .attr("fill", "goldenrod")
-        //   .attr("id", (d) => d.popularity);
+        // katy perry
+        chartArea
+          .append("path")
+          .datum(katyData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "orange")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
       };
       accessData();
     </script>
