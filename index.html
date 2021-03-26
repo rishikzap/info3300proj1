@@ -2,21 +2,25 @@
   <head>
     <title>3300 Project 1</title>
     <script src="https://d3js.org/d3.v6.min.js"></script>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-<link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com"> 
+<link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet"> 
   </head>
   <body>
     <style>
+      
       html {
         font-family:'Lato', sans-serif;
       }
+
+      /* gridline styles */
       .gridlines line {
         stroke: #bbb;
       }
       .gridlines .domain {
         stroke: none;
       }
-
+      
+      /* genre title */
       .title {
         text-align: right;
         font-family:'Lato', sans-serif;
@@ -28,6 +32,7 @@
         margin-bottom: 0px;
       }
       
+      /* spotify title */
       img {
         height: 30%;
         width: 30%;
@@ -35,6 +40,8 @@
         margin-left: auto;
         margin-right: auto;
       }
+      
+      /* descriptions paragraph for graphs */
       .g-descr{
         background-color: #00D856;
         border: solid 4px black;
@@ -45,14 +52,23 @@
         font-family: 'proxima-nova', sans-serif;
         color: black;
       }
+      
+      /* title for each graph */
       h1{
         padding-left: 80px !important;
         color: #00D856;
       }
     </style>
-    <img src="spotify.jpeg">
+
+    <!-- spotify logo with description -->
+    <img src="spotify.jpeg" alt = "spotify logo">
+    <!-- source: https://developer.spotify.com/documentation/general/design-and-branding/ -->
+    
+    <!-- first visualization -->
     <h1> Score vs Year Spotify Visualization</h1>
     <svg id="lineGraph" height="500" width="1300"></svg>
+
+    <!-- description of first visualization -->
     <div class="g-descr">The line graph shows different music measurements over time. Energy, 
       valence, danceability, and instrumentalness can take on values between 0 and 1. Energy 
       is a measure of the intensity of a song. High energy songs are fast and loud (rock), while classical
@@ -66,19 +82,24 @@
       measurement values. See <a href = "https://developer.spotify.com/documentation/web-api/reference/#endpoint-get-several-audio-features">Spotify Documentation</a>
       for more detail about the measurements. 
     </div>
+    
+    <!-- second visualization -->
     <h1> Score vs Genre Spotify Visualization</h1>
     <div class="bar-graphs">
       <svg id="g1" height="500" width="400"></svg>
       <svg id="g2" height="500" width="400"></svg>
       <svg id="g3" height="500" width="400"></svg>
     </div>
+    
+    <!-- description of second visualization -->
     <div class="g-descr">
       The bar charts show different music measurements by genre. Energy, valence, danceability, and instrumentalness
       are defined in the same way as in the line graph and can be interpreted similarly for the bar charts. The score
       axis also ranges from 0 to 1 with each bar representing a distinct category of music measurment.
     </div>
+    
     <script>
-      //lineGraph happiness vs year
+      // line graph of music metrics (valence, instrumentalness, energy, and danceabiliry) vs year
       const svgLineGraph = d3.select("svg#lineGraph");
       let height = svgLineGraph.attr("height");
       let width = svgLineGraph.attr("width");
@@ -86,13 +107,16 @@
       let chartWidth = width - margin.left - margin.right;
       let chartHeight = height - margin.top - margin.bottom;
       let annotations = svgLineGraph.append("g").attr("id", "annotations1");
+      
+      // creating year axis label to line graph
       svgLineGraph.append("text").text("Year")
           .attr("x",chartWidth / 2 + margin.right + margin.left)
           .attr("y",chartHeight+margin.bottom)
           .style("font-size","20px")
           .attr("class", "title")
           .attr("text-anchor", "end");
-
+          
+      // creating score axis label to line graph
       svgLineGraph.append("text").text("Score")
           .style("font-size","20px")
           .attr("class", "vertical")
@@ -104,15 +128,17 @@
         .attr("id", "chart1")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
+      // adding legend to line graph 
       let legend = chartArea
         .append("g")
         .attr("transform", `translate(${chartWidth - 130}, ${margin.top})`)
         .attr("class", "legend");
 
+      // creating legend for line graph 
       const legendFrame = legend
         .append("rect")
         .attr("class", "frame")
-        .attr("x", 0)
+        .attr("x", 0) 
         .attr("y", 0)
         .attr("rx", 10)
         .attr("ry", 10)
@@ -123,10 +149,12 @@
         .attr("stroke", "black");
 
       const accessData = async function () {
+        // getting all csv data
         let allData = await d3.csv("data.csv");
         let data = await d3.csv("data_by_year.csv");
         let gData = await d3.csv("data_by_genres.csv");
 
+        // filter out 2021, convert str dates to date-time objects
         data = data.filter((d) => d["year"] != "2021");
 
         let timeParser = d3.timeParse("%Y");
@@ -154,11 +182,13 @@
           "danceability",
           "instrumentalness",
         ];
+
         let barColorScale = d3
           .scaleOrdinal()
           .domain(colorExtent)
           .range(d3.schemeCategory10);
 
+        // generate legend for line graph
         let j = 15;
         for (let i = 0; i < colorExtent.length; i++) {
           legend
@@ -169,20 +199,23 @@
             .attr("y", j);
           j += 15;
         }
-        //x-axis
+        
+        // x-axis line graph 
         let xAxis1 = d3.axisBottom(dateScale);
+        
         let xGridlines1 = d3
           .axisBottom(dateScale)
           .tickSize(-chartHeight - 10)
           .tickFormat("");
 
-        //y-axis
+        // y-axis line graph 
         let yAxis1 = d3.axisLeft(musicMeasureScale);
+        
         let yGridlines1 = d3
           .axisLeft(musicMeasureScale)
           .tickSize(-chartWidth - 10)
           .tickFormat("");
-
+        
         annotations
           .append("g")
           .attr("class", "y axis")
@@ -213,22 +246,14 @@
           )
           .call(xGridlines1);
 
-        //line generator
-        let variables = [
-          "energy",
-          "valence",
-          "danceability",
-          "instrumentalness",
-        ];
-
-        variables.forEach((i) => {
+        // draw different lines
+        colorExtent.forEach((i) => {
           let lineGen = d3
             .line()
             .x((d) => dateScale(d["year_date"]))
             .y((d) => musicMeasureScale(d[i]))
             .curve(d3.curveMonotoneX);
 
-          console.log(i);
           chartArea
             .append("path")
             .datum(data)
@@ -240,6 +265,8 @@
             .attr("id", i);
         });
 
+        // function to generate individual bar plot. Takes in svgid and genre
+        // to modify the given svg with the specified genre data 
         function createGenreGraph(gId, genre) {
           const svg = d3.select("svg#" + gId);
           const height = svg.attr("height");
@@ -247,6 +274,7 @@
           const chartWidth = width - margin.left - margin.right;
           const chartHeight = height - margin.top - margin.bottom;
           let annotations = svg.append("g").attr("id", "annotations");
+          
           svg.append("text").text(genre.charAt(0).toUpperCase() + genre.slice(1))
           .attr("x",chartWidth + margin.left)
           .attr("y",margin.top+20)
@@ -272,14 +300,14 @@
             .attr("id", "chart")
             .attr("transform", `translate(${margin.left},${margin.top})`);
 
-          // x scale (attributes)
-
+          // x scale (different music metrix)
           const xScale = d3
             .scaleBand()
             .domain(colorExtent) // colorExtent == all measures
             .range([0, chartWidth])
             .padding(0.1);
-          // y scale is musicMeasureScale already defined above.
+
+          // y scale is musicMeasureScale already defined above for line graph
           // y axis / grids
           annotations
             .append("g")
@@ -307,14 +335,16 @@
 
           // get specific genre-level data
           let genreData = gData.filter((d) => d["genres"] === genre);
-          console.log(genreData);
+
+          // 2d array for data join 
           let metrics = [
             [genreData[0].energy, "energy"],
             [genreData[0].valence, "valence"],
             [genreData[0].danceability, "danceability"],
             [genreData[0].instrumentalness, "instrumentalness"],
           ];
-          console.log(metrics);
+          
+          // generate bars 
           chartArea
             .selectAll("rect#bar")
             .data(metrics)
@@ -328,14 +358,11 @@
               (d) => musicMeasureScale(0) - musicMeasureScale(d[0])
             )
             .attr("width", (d) => xScale.bandwidth());
-
-          // valence values
         }
+        // generating the graphs
         createGenreGraph("g1", "classical");
         createGenreGraph("g2", "pop");
         createGenreGraph("g3", "rock");
-
-        console.log(gData.filter((d) => d["genres"] === "hip hop"));
       };
       accessData();
     </script>
