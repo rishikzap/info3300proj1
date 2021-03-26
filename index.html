@@ -1,18 +1,35 @@
-<html>
+<!DOCTYPE html >
   <head>
+    <title>3300 Project 1</title>
     <script src="https://d3js.org/d3.v6.min.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
   </head>
   <body>
     <style>
+      html {
+        font-family:'Lato', sans-serif;
+      }
       .gridlines line {
         stroke: #bbb;
       }
       .gridlines .domain {
         stroke: none;
       }
+
+      .title {
+        text-align: right;
+        font-family:'Lato', sans-serif;
+        font-weight: 900;
+      }
+
+      svg {
+        margin-left: 50px;
+      }
+
     </style>
     <p>How has</p>
-    <svg id="lineGraph" height="500" width="1200"></svg>
+    <svg id="lineGraph" height="500" width="1300"></svg>
     <div class="bar-graphs">
       <svg id="g1" height="500" width="400"></svg>
       <svg id="g2" height="500" width="400"></svg>
@@ -23,17 +40,22 @@
       const svgLineGraph = d3.select("svg#lineGraph");
       let height = svgLineGraph.attr("height");
       let width = svgLineGraph.attr("width");
-      const margin = { top: 10, right: 20, bottom: 50, left: 70 };
+      const margin = { top: 10, right: 20, bottom: 130, left: 70 };
       let chartWidth = width - margin.left - margin.right;
       let chartHeight = height - margin.top - margin.bottom;
       let annotations = svgLineGraph.append("g").attr("id", "annotations1");
+      svgLineGraph.append("text").text("Year")
+          .attr("x",chartWidth / 2 + margin.right + margin.left)
+          .attr("y",chartHeight+margin.bottom-50)
+          .style("font-size","20px")
+          .attr("class", "title")
+          .attr("text-anchor", "end");
+
       let chartArea = svgLineGraph
         .append("g")
         .attr("id", "chart1")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      // stringLen function from Lecture 3/17 by Professor Jeff Rezertoski
-      // Legend
       let legend = chartArea
         .append("g")
         .attr("transform", `translate(${chartWidth - 130}, ${margin.top})`)
@@ -63,7 +85,6 @@
 
         data.forEach((d) => {
           d["year_date"] = timeParser(d["year"]);
-          d["popularity_scaled"] = d["popularity"] / 100;
         });
 
         // get extent and scales
@@ -96,7 +117,6 @@
             .append("text")
             .text(colorExtent[i])
             .style("fill", barColorScale(colorExtent[i]))
-            .style("font-family", "Arial")
             .attr("x", 5)
             .attr("y", j);
           j += 15;
@@ -179,6 +199,13 @@
           const chartWidth = width - margin.left - margin.right;
           const chartHeight = height - margin.top - margin.bottom;
           let annotations = svg.append("g").attr("id", "annotations");
+          svg.append("text").text(genre.charAt(0).toUpperCase() + genre.slice(1))
+          .attr("x",chartWidth + margin.left)
+          .attr("y",margin.top+20)
+          .style("font-size","20px")
+          .attr("class", "title")
+          .attr("text-anchor", "end");
+
           let chartArea = svg
             .append("g")
             .attr("id", "chart")
