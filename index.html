@@ -25,37 +25,71 @@
 
       svg {
         margin-left: 50px;
+        margin-bottom: 0px;
       }
-
+      
+      img {
+        height: 30%;
+        width: 30%;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .g-descr{
+        background-color: #1DB954;
+        border-style: solid;
+        border-radius: 10px;
+        padding: 5px;
+        margin: 10px;
+        margin-bottom: 30px;
+      }
     </style>
-    <p>How has</p>
+    <img src="spotify.jpeg">
     <svg id="lineGraph" height="500" width="1300"></svg>
+    <div class="g-descr">The line graph shows different music measurements over time. Energy, 
+      valence, danceability, and instrumentalness can take on values between 0 and 1. Energy 
+      is a measure of the intensity of a song. High energy songs are fast and loud (rock), while classical
+      music is a good representation of low energy songs. Valence
+      measures the positiveness of a song. Thus high valence values indicates the sound is more
+      positive and can be associated with happiness, and a lower valence value indicates a negative or 
+      sad sound. Danceability is a measure that indicates whether a song or sound is well suited for dancing.
+      It is calculated by accounting for the tempo, rhythm, and other factors of a track. Instrumentalness is 
+      a measure that reflects the amount of vocals in a track. For example, classical music has a low value of 
+      instrumentalness, while modern pop songs will have higher values. The score axis reflects all of these 
+      measurement values. See <a href = "https://developer.spotify.com/documentation/web-api/reference/#endpoint-get-several-audio-features">Spotify Documentation</a>
+      for more detail about the measurements. 
+    </div>
+
     <div class="bar-graphs">
       <svg id="g1" height="500" width="400"></svg>
       <svg id="g2" height="500" width="400"></svg>
       <svg id="g3" height="500" width="400"></svg>
+    </div>
+    <div class="g-descr">
+      The bar charts show different music measurements by genre. Energy, valence, danceability, and instrumentalness
+      are defined in the same way as in the line graph and can be interpreted similarly for the bar charts. The score
+      axis also ranges from 0 to 1 with each bar representing a distinct category of music measurment.
     </div>
     <script>
       //lineGraph happiness vs year
       const svgLineGraph = d3.select("svg#lineGraph");
       let height = svgLineGraph.attr("height");
       let width = svgLineGraph.attr("width");
-      const margin = { top: 10, right: 20, bottom: 130, left: 70 };
+      const margin = { top: 10, right: 20, bottom: 70, left: 70 };
       let chartWidth = width - margin.left - margin.right;
       let chartHeight = height - margin.top - margin.bottom;
       let annotations = svgLineGraph.append("g").attr("id", "annotations1");
       svgLineGraph.append("text").text("Year")
           .attr("x",chartWidth / 2 + margin.right + margin.left)
-          .attr("y",chartHeight+margin.bottom-50)
+          .attr("y",chartHeight+margin.bottom)
           .style("font-size","20px")
           .attr("class", "title")
           .attr("text-anchor", "end");
 
-      svgLineGraph.append("text").text("Music Measure")
-          .attr("x", 0)
-          .attr("y",chartHeight / 2 + margin.top - margin.bottom)
+      svgLineGraph.append("text").text("Score")
           .style("font-size","20px")
-          .attr("class", "title")
+          .attr("class", "vertical")
+          .attr("transform", "translate(20," + chartHeight / 2 + ") rotate(-90)")
           .attr("text-anchor", "end");
 
       let chartArea = svgLineGraph
@@ -209,6 +243,19 @@
           svg.append("text").text(genre.charAt(0).toUpperCase() + genre.slice(1))
           .attr("x",chartWidth + margin.left)
           .attr("y",margin.top+20)
+          .style("font-size","20px")
+          .attr("class", "title")
+          .attr("text-anchor", "end");
+
+          svg.append("text").text("Score")
+          .style("font-size","20px")
+          .attr("class", "vertical")
+          .attr("transform", "translate(20," + chartHeight / 2 + ") rotate(-90)")
+          .attr("text-anchor", "end");
+
+          svg.append("text").text("Music Metric")
+          .attr("x", chartWidth / 2 + margin.right + margin.left + 50)
+          .attr("y", chartHeight + margin.bottom)
           .style("font-size","20px")
           .attr("class", "title")
           .attr("text-anchor", "end");
