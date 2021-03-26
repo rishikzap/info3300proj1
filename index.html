@@ -14,6 +14,8 @@
     <svg id="lineGraph" height="500" width="1000"></svg>
     <svg id="zoomedInLineGraph" height="500" width="1000"></svg>
     <svg id="taylorSwiftGraph" height="500" width="1000"></svg>
+    <svg id="countryGraph" height="500" width="1000"></svg>
+    <svg id="rockGraph" height="500" width="1000"></svg>
     <script>
       const svgLineGraph = d3.select("svg#lineGraph");
       let height = svgLineGraph.attr("height");
@@ -59,6 +61,14 @@
         let justinData = await d3.csv("justin_data.csv");
         let mileyData = await d3.csv("miley_data.csv");
         let katyData = await d3.csv("katy_data.csv");
+        let dierksData = await d3.csv("dierks_data.csv");
+        let mirandaData = await d3.csv("miranda_data.csv");
+        let carrieData = await d3.csv("carrie_data.csv");
+        let jasonData = await d3.csv("jason_data.csv");
+        let blakeData = await d3.csv("blake_data.csv");
+        let kissData = await d3.csv("kiss_data.csv");
+        let acdcData = await d3.csv("acdc_data.csv");
+        let queenData = await d3.csv("queen_data.csv");
 
         data = data.filter((d) => d["year"] != "2021");
 
@@ -149,30 +159,21 @@
           .call(xGridlines1);
 
         //line generator
-        let variables = [
-          "energy",
-          "valence",
-          "danceability",
-          "instrumentalness",
-        ];
 
-        variables.forEach((i) => {
-          let lineGen = d3
-            .line()
-            .x((d) => dateScale(d["year_date"]))
-            .y((d) => musicMeasureScale(d[i]))
-            .curve(d3.curveMonotoneX);
+        let lineGen = d3
+          .line()
+          .x((d) => dateScale(d["year_date"]))
+          .y((d) => musicMeasureScale(d["valence"]))
+          .curve(d3.curveMonotoneX);
 
-          chartArea
-            .append("path")
-            .datum(data)
-            .attr("class", "line")
-            .attr("fill", "none")
-            .attr("stroke", barColorScale(i))
-            .attr("stroke-width", 3)
-            .attr("d", (d) => lineGen(d))
-            .attr("id", i);
-        });
+        chartArea
+          .append("path")
+          .datum(data)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "orange")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
 
         //START HERE line graph genre 1
         const zoomedSvg = d3.select("svg#zoomedInLineGraph");
@@ -253,7 +254,7 @@
           )
           .call(bottomGridlines);
 
-        let lineGen = d3
+        lineGen = d3
           .line()
           .x((d) => timeScale(d["year"]))
           .y((d) => musicMeasureScale(d["valence"]))
@@ -412,7 +413,197 @@
           .attr("stroke", "orange")
           .attr("stroke-width", 3)
           .attr("d", (d) => lineGen(d));
+
+        const countrySvg = d3.select("svg#countryGraph");
+        height = countrySvg.attr("height");
+        width = countrySvg.attr("width");
+
+        annotations = countrySvg.append("g").attr("id", "annotations");
+
+        chartArea = countrySvg
+          .append("g")
+          .attr("id", "chart4")
+          .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        timeExtent = d3.extent(taylorData, (d) => d["year"]);
+        timeScale = d3.scaleLinear().domain(timeExtent).range([0, chartWidth]);
+        bottomAxis = d3.axisBottom(timeScale).tickFormat(d3.format("~f"));
+        bottomGridlines = d3
+          .axisBottom(timeScale)
+          .tickSize(-chartHeight - 10)
+          .tickFormat("");
+
+        leftAxis = d3.axisLeft(musicMeasureScale);
+        leftGridlines = d3
+          .axisLeft(musicMeasureScale)
+          .tickSize(-chartWidth - 10)
+          .tickFormat("");
+
+        annotations
+          .append("g")
+          .attr("class", "y axis")
+          .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+          .call(leftAxis);
+
+        annotations
+          .append("g")
+          .attr("class", "y gridelines")
+          .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+          .call(leftGridlines);
+        annotations
+          .append("g")
+          .attr("class", "x axis")
+          .attr(
+            "transform",
+            `translate(${margin.left},${chartHeight + margin.top + 10})`
+          )
+          .call(bottomAxis);
+        annotations
+          .append("g")
+          .attr("class", "x gridlines")
+          .attr(
+            "transform",
+            `translate(${margin.left},${chartHeight + margin.top + 10})`
+          )
+          .call(bottomGridlines);
+
+        // dierks bentley
+        chartArea
+          .append("path")
+          .datum(dierksData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "red")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
+
+        // miranda lambert
+        chartArea
+          .append("path")
+          .datum(mirandaData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "blue")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
+
+        // carrie underwood
+        chartArea
+          .append("path")
+          .datum(carrieData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "green")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
+
+        // jason aldean
+        chartArea
+          .append("path")
+          .datum(jasonData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "black")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
+
+        // blake shelton
+        chartArea
+          .append("path")
+          .datum(blakeData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "orange")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
+
+        const rockSvg = d3.select("svg#rockGraph");
+        height = rockSvg.attr("height");
+        width = rockSvg.attr("width");
+
+        annotations = rockSvg.append("g").attr("id", "annotations");
+
+        chartArea = rockSvg
+          .append("g")
+          .attr("id", "chart3")
+          .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        timeExtent = d3.extent(taylorData, (d) => d["year"]);
+        timeScale = d3
+          .scaleLinear()
+          .domain([1970, 2020])
+          .range([0, chartWidth]);
+        bottomAxis = d3.axisBottom(timeScale).tickFormat(d3.format("~f"));
+        bottomGridlines = d3
+          .axisBottom(timeScale)
+          .tickSize(-chartHeight - 10)
+          .tickFormat("");
+
+        leftAxis = d3.axisLeft(musicMeasureScale);
+        leftGridlines = d3
+          .axisLeft(musicMeasureScale)
+          .tickSize(-chartWidth - 10)
+          .tickFormat("");
+
+        annotations
+          .append("g")
+          .attr("class", "y axis")
+          .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+          .call(leftAxis);
+
+        annotations
+          .append("g")
+          .attr("class", "y gridelines")
+          .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+          .call(leftGridlines);
+        annotations
+          .append("g")
+          .attr("class", "x axis")
+          .attr(
+            "transform",
+            `translate(${margin.left},${chartHeight + margin.top + 10})`
+          )
+          .call(bottomAxis);
+        annotations
+          .append("g")
+          .attr("class", "x gridlines")
+          .attr(
+            "transform",
+            `translate(${margin.left},${chartHeight + margin.top + 10})`
+          )
+          .call(bottomGridlines);
+
+        // KISS
+        chartArea
+          .append("path")
+          .datum(kissData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "red")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
+
+        // AC/DC
+        chartArea
+          .append("path")
+          .datum(acdcData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "blue")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
+
+        // Queen
+        chartArea
+          .append("path")
+          .datum(queenData)
+          .attr("class", "line")
+          .attr("fill", "none")
+          .attr("stroke", "green")
+          .attr("stroke-width", 3)
+          .attr("d", (d) => lineGen(d));
       };
+
       accessData();
     </script>
   </body>
