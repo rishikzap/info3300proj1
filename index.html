@@ -51,6 +51,13 @@
           .attr("class", "title")
           .attr("text-anchor", "end");
 
+      svgLineGraph.append("text").text("Music Measure")
+          .attr("x", 0)
+          .attr("y",chartHeight / 2 + margin.top - margin.bottom)
+          .style("font-size","20px")
+          .attr("class", "title")
+          .attr("text-anchor", "end");
+
       let chartArea = svgLineGraph
         .append("g")
         .attr("id", "chart1")
